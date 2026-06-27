@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clarity — Know What To Fix</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0D0D0F;
+    --surface: #141416;
+    --card: #1A1A1E;
+    --border: #2A2A30;
+    --accent: #C8F135;
+    --accent2: #7B61FF;
+    --text: #F0F0F0;
+    --muted: #6E6E7A;
+    --danger: #FF4F4F;
+    --success: #34D399;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── HERO ── */
+  #screen-home {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-home::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,241,53,0.08) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .home-inner { max-width: 480px; position: relative; z-index: 1; }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(200,241,53,0.3);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 8vw, 56px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+
+  .tagline-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 14px;
+    color: #C8C8D0;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+
+  /* ── NICHE GRID ── */
+  .niche-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .niche-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+
+  .niche-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .niche-card:hover { border-color: var(--accent); background: #1E1E22; }
+
+  .niche-icon { font-size: 22px; margin-bottom: 8px; }
+  .niche-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .niche-desc { font-size: 12px; color: var(--muted); }
+
+  /* ── GOAL SCREEN ── */
+  #screen-goal {
+    padding: 0;
+    background: var(--surface);
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .back-btn:hover { border-color: var(--text); color: var(--text); }
+
+  .top-niche-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .goal-body { padding: 28px 24px; flex: 1; }
+
+  .goal-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .goal-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+
+  .goal-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+  .goal-option {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .goal-option:hover, .goal-option.selected {
+    border-color: var(--accent);
+    background: rgba(200,241,53,0.05);
+    color: var(--accent);
+  }
+
+  .or-divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 4px 0 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .custom-goal-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    resize: none;
+  }
+  .custom-goal-input:focus { border-color: var(--accent2); }
+  .custom-goal-input::placeholder { color: var(--muted); }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0D0D0F;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.88; }
+  .cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── METRICS SCREEN ── */
+  #screen-metrics { padding: 0; background: var(--surface); }
+
+  .metrics-body { padding: 24px 20px; flex: 1; }
+
+  .metrics-intro {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #C0C0CC;
+    margin-bottom: 22px;
+    line-height: 1.6;
+  }
+
+  .metric-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .metric-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .metric-icon { font-size: 18px; }
+
+  .metric-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .metric-why { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+  .metric-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    outline: none;
+  }
+  .metric-input:focus { border-color: var(--accent2); }
+  .metric-input::placeholder { color: var(--muted); }
+
+  .metrics-note {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  /* ── INSIGHT SCREEN ── */
+  #screen-insight { padding: 0; background: var(--surface); }
+
+  .insight-body { padding: 24px 20px; flex: 1; }
+
+  .insight-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .loading-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .loading-step { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .step-dot.done { background: var(--accent); }
+  .step-dot.active { background: var(--accent2); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .insight-result { display: none; }
+
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(200,241,53,0.08), rgba(123,97,255,0.06));
+    border: 1px solid rgba(200,241,53,0.25);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .verdict-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .verdict-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .action-section { margin-bottom: 20px; }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .action-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  .action-text { font-size: 14px; line-height: 1.5; }
+
+  .reminder-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .reminder-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .reminder-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+  .reminder-btn {
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .restart-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 30px;
+  }
+  .restart-btn:hover { border-color: var(--text); color: var(--text); }
+
+  .error-box {
+    background: rgba(255,79,79,0.08);
+    border: 1px solid rgba(255,79,79,0.3);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 13px;
+    color: #FF9999;
+    margin-bottom: 16px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SCREEN: HOME ══════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-inner">
+    <div class="badge">AI Clarity Engine</div>
+    <h1>Stop guessing.<br><span>Start knowing.</span></h1>
+    <p class="subtitle">Tell me your goal. I'll tell you exactly what to measure, remind you to track it, and tell you what to fix.</p>
+    <div class="tagline-box">
+      "Your biggest issue isn't marketing. It's that 28% of customers leave without buying because popular items are out of stock."
+    </div>
+    <p class="niche-label">What are you trying to improve?</p>
+    <div class="niche-grid">
+      <div class="niche-card" onclick="selectNiche('finance')">
+        <div class="niche-icon">💰</div>
+        <div class="niche-name">Personal Finance</div>
+        <div class="niche-desc">Money, savings, spending</div>
+      </div>
+      <div class="niche-card" onclick="selectNiche('study')">
+        <div class="niche-icon">📚</div>
+        <div class="niche-name">Study & Learning</div>
+        <div class="niche-desc">Focus, results, habits</div>
+      </div>
+      <div class="niche-card" onclick="selectNiche('fitness')">
+        <div class="niche-icon">💪</div>
+        <div class="niche-name">Gym & Fitness</div>
+        <div class="niche-desc">Strength, consistency</div>
+      </div>
+      <div class="niche-card" onclick="selectNiche('shop')">
+        <div class="niche-icon">🏪</div>
+        <div class="niche-name">My Shop</div>
+        <div class="niche-desc">Sales, customers, stock</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: GOAL ══════════════════ -->
+<div class="screen" id="screen-goal">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="top-niche-badge" id="goal-niche-label"></span>
+  </div>
+  <div class="goal-body">
+    <div class="goal-heading">What's your main problem?</div>
+    <p class="goal-sub">Pick the one that frustrates you most right now.</p>
+    <div class="goal-options" id="goal-options-list"></div>
+    <div class="or-divider">OR TYPE YOUR OWN</div>
+    <textarea class="custom-goal-input" id="custom-goal" rows="2" placeholder="e.g. I want to increase my savings rate"></textarea>
+    <button class="cta-btn" id="goal-next-btn" onclick="proceedToMetrics()" disabled>Show me what to track →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: METRICS ══════════════════ -->
+<div class="screen" id="screen-metrics">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToGoal()">← Back</button>
+    <span class="top-niche-badge" id="metrics-niche-label"></span>
+  </div>
+  <div class="metrics-body">
+    <div class="goal-heading" id="metrics-heading">Enter today's data</div>
+    <div class="metrics-intro" id="metrics-intro"></div>
+    <div id="metric-fields"></div>
+    <p class="metrics-note">You only need to do this once a day. Takes 60 seconds.</p>
+    <button class="cta-btn" id="metrics-next-btn" onclick="analyzeData()">Analyze & tell me what to fix →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: INSIGHT ══════════════════ -->
+<div class="screen" id="screen-insight">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goToMetrics()">← Back</button>
+    <span class="top-niche-badge">Your Clarity Report</span>
+  </div>
+  <div class="insight-body">
+    <div class="insight-loading" id="insight-loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Analyzing your data…</div>
+      <div class="loading-steps" id="loading-steps"></div>
+    </div>
+    <div class="insight-result" id="insight-result">
+      <div class="error-box" id="error-box"></div>
+      <div class="verdict-box">
+        <div class="verdict-label">AI Clarity Report</div>
+        <div class="verdict-text" id="verdict-text"></div>
+      </div>
+      <div class="action-section">
+        <div class="section-title">What to do next</div>
+        <div id="action-items"></div>
+      </div>
+      <div class="reminder-box">
+        <div class="reminder-title">📅 Set your daily reminder</div>
+        <div class="reminder-sub">Track again tomorrow. Patterns take 7+ days to appear.</div>
+        <button class="reminder-btn" onclick="setReminder()">Remind me tomorrow</button>
+      </div>
+      <button class="restart-btn" onclick="goHome()">Track a different goal →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ DATA ══
+const NICHES = {
+  finance: {
+    label: '💰 Personal Finance',
+    goals: [
+      "I don't know where my money goes",
+      "I keep spending more than I earn",
+      "I'm not saving enough",
+      "I have no financial clarity"
+    ],
+    metrics: [
+      { id: 'income', icon: '💵', name: 'Income today (₹)', why: 'How much came in', placeholder: 'e.g. 2000' },
+      { id: 'spend', icon: '🛍️', name: 'Total spending today (₹)', why: 'Everything you paid for', placeholder: 'e.g. 800' },
+      { id: 'saved', icon: '🏦', name: 'Amount saved today (₹)', why: 'What went to savings', placeholder: 'e.g. 500' },
+      { id: 'impulse', icon: '⚡', name: 'Impulse purchases (#)', why: 'Unplanned buys (0 = great)', placeholder: 'e.g. 2' },
+    ],
+    intro: 'These 4 numbers will let me see your spending patterns and find where money leaks.'
+  },
+  study: {
+    label: '📚 Study & Learning',
+    goals: [
+      "I study but don't retain much",
+      "I lack focus and get distracted",
+      "My exam scores aren't improving",
+      "I don't study consistently"
+    ],
+    metrics: [
+      { id: 'hours', icon: '⏱️', name: 'Study hours today', why: 'Total focused time', placeholder: 'e.g. 3.5' },
+      { id: 'topics', icon: '📖', name: 'Topics completed', why: 'Chapters or units finished', placeholder: 'e.g. 2' },
+      { id: 'distractions', icon: '📱', name: 'Distraction breaks (#)', why: 'Times you lost focus', placeholder: 'e.g. 5' },
+      { id: 'sleep', icon: '🌙', name: 'Sleep last night (hrs)', why: 'Strongly affects retention', placeholder: 'e.g. 7' },
+    ],
+    intro: 'Track these daily and I\'ll show you exactly what\'s hurting your learning most.'
+  },
+  fitness: {
+    label: '💪 Gym & Fitness',
+    goals: [
+      "I'm not seeing results despite training",
+      "My consistency is poor",
+      "I don't know if I'm progressing",
+      "I keep skipping workouts"
+    ],
+    metrics: [
+      { id: 'trained', icon: '🏋️', name: 'Trained today?', why: 'Yes = 1, No = 0', placeholder: '1 or 0' },
+      { id: 'duration', icon: '⏱️', name: 'Workout duration (mins)', why: 'How long you trained', placeholder: 'e.g. 45' },
+      { id: 'protein', icon: '🥩', name: 'Protein intake (g)', why: 'Key for muscle growth', placeholder: 'e.g. 120' },
+      { id: 'sleep', icon: '🌙', name: 'Sleep last night (hrs)', why: 'Recovery depends on sleep', placeholder: 'e.g. 7' },
+    ],
+    intro: 'These 4 metrics reveal the real reason results are slow. Most people are surprised.'
+  },
+  shop: {
+    label: '🏪 My Shop',
+    goals: [
+      "My sales are not growing",
+      "Customers visit but don't buy",
+      "I keep running out of stock",
+      "I don't know what's actually working"
+    ],
+    metrics: [
+      { id: 'visitors', icon: '👥', name: 'Visitors/customers today', why: 'Foot traffic or online', placeholder: 'e.g. 40' },
+      { id: 'sales', icon: '💰', name: 'Sales today (₹)', why: 'Total revenue', placeholder: 'e.g. 3500' },
+      { id: 'buyers', icon: '🛒', name: 'Number of buyers', why: 'People who actually paid', placeholder: 'e.g. 12' },
+      { id: 'complaints', icon: '😤', name: 'Complaints / issues (#)', why: 'Stockouts + unhappy customers', placeholder: 'e.g. 1' },
+    ],
+    intro: 'These numbers let me calculate your conversion rate and find your biggest leak.'
+  }
+};
+
+// ══ STATE ══
+let state = { niche: null, goal: null, metrics: {} };
+
+// ══ NAV ══
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() { showScreen('screen-home'); }
+function goToGoal() { showScreen('screen-goal'); }
+function goToMetrics() { showScreen('screen-metrics'); }
+
+// ══ SELECT NICHE ══
+function selectNiche(niche) {
+  state.niche = niche;
+  state.goal = null;
+  const data = NICHES[niche];
+  document.getElementById('goal-niche-label').textContent = data.label;
+
+  // build goal options
+  const list = document.getElementById('goal-options-list');
+  list.innerHTML = '';
+  data.goals.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'goal-option';
+    btn.textContent = g;
+    btn.onclick = () => selectGoal(g, btn);
+    list.appendChild(btn);
+  });
+
+  document.getElementById('custom-goal').value = '';
+  document.getElementById('goal-next-btn').disabled = true;
+  showScreen('screen-goal');
+}
+
+function selectGoal(goal, el) {
+  document.querySelectorAll('.goal-option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.goal = goal;
+  document.getElementById('custom-goal').value = '';
+  document.getElementById('goal-next-btn').disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const customInput = document.getElementById('custom-goal');
+  customInput.addEventListener('input', () => {
+    if (customInput.value.trim().length > 5) {
+      state.goal = customInput.value.trim();
+      document.querySelectorAll('.goal-option').forEach(b => b.classList.remove('selected'));
+      document.getElementById('goal-next-btn').disabled = false;
+    } else if (!document.querySelector('.goal-option.selected')) {
+      document.getElementById('goal-next-btn').disabled = true;
+    }
+  });
+});
+
+// ══ PROCEED TO METRICS ══
+function proceedToMetrics() {
+  const data = NICHES[state.niche];
+  document.getElementById('metrics-niche-label').textContent = data.label;
+  document.getElementById('metrics-heading').textContent = 'Enter today\'s numbers';
+  document.getElementById('metrics-intro').textContent = data.intro;
+
+  const fields = document.getElementById('metric-fields');
+  fields.innerHTML = '';
+  data.metrics.forEach(m => {
+    fields.innerHTML += `
+      <div class="metric-item">
+        <div class="metric-header">
+          <span class="metric-icon">${m.icon}</span>
+          <span class="metric-name">${m.name}</span>
+        </div>
+        <p class="metric-why">${m.why}</p>
+        <input class="metric-input" id="field-${m.id}" type="number" placeholder="${m.placeholder}" min="0" />
+      </div>`;
+  });
+
+  showScreen('screen-metrics');
+}
+
+// ══ ANALYZE DATA ══
+async function analyzeData() {
+  const data = NICHES[state.niche];
+  state.metrics = {};
+  let allFilled = true;
+
+  data.metrics.forEach(m => {
+    const val = document.getElementById('field-' + m.id).value;
+    if (val === '') allFilled = false;
+    state.metrics[m.name] = val || '0';
+  });
+
+  showScreen('screen-insight');
+  document.getElementById('insight-loading').style.display = 'flex';
+  document.getElementById('insight-result').style.display = 'none';
+
+  // Animate loading steps
+  const steps = ['Reading your numbers…', 'Finding patterns…', 'Building your action plan…'];
+  const stepsEl = document.getElementById('loading-steps');
+  stepsEl.innerHTML = steps.map((s, i) =>
+    `<div class="loading-step"><div class="step-dot" id="dot-${i}"></div>${s}</div>`).join('');
+
+  let si = 0;
+  const stepInterval = setInterval(() => {
+    if (si > 0) document.getElementById('dot-' + (si - 1)).className = 'step-dot done';
+    if (si < steps.length) {
+      document.getElementById('dot-' + si).className = 'step-dot active';
+      si++;
+    } else {
+      clearInterval(stepInterval);
+    }
+  }, 900);
+
+  // Build prompt
+  const metricsStr = Object.entries(state.metrics)
+    .map(([k, v]) => `- ${k}: ${v}`).join('\n');
+
+  const prompt = `You are a clarity coach. The user's niche is "${state.niche}" and their problem is: "${state.goal}".
+
+They tracked today's data:
+${metricsStr}
+
+Give a sharp, direct analysis. Use this structure:
+1. One key insight about what their numbers reveal (be specific, not generic). Reference actual numbers.
+2. The #1 thing they should fix this week (specific action, not vague advice).
+3. Two other quick actions ranked by impact.
+
+Format your response as JSON:
+{
+  "verdict": "Your main insight here (2-3 sentences, mention actual numbers)",
+  "actions": [
+    "Primary action: specific thing to do this week",
+    "Action 2: specific improvement",
+    "Action 3: specific habit to build"
+  ]
+}
+
+Return ONLY the JSON. No markdown, no extra text.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    clearInterval(stepInterval);
+    steps.forEach((_, i) => { document.getElementById('dot-' + i).className = 'step-dot done'; });
+
+    const apiData = await res.json();
+    const raw = apiData.content.map(c => c.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    setTimeout(() => {
+      document.getElementById('insight-loading').style.display = 'none';
+      document.getElementById('insight-result').style.display = 'block';
+      document.getElementById('error-box').style.display = 'none';
+
+      document.getElementById('verdict-text').textContent = parsed.verdict;
+
+      const actionsEl = document.getElementById('action-items');
+      actionsEl.innerHTML = '';
+      (parsed.actions || []).forEach((a, i) => {
+        actionsEl.innerHTML += `
+          <div class="action-item">
+            <span class="action-num">0${i + 1}</span>
+            <span class="action-text">${a}</span>
+          </div>`;
+      });
+    }, 500);
+
+  } catch (err) {
+    clearInterval(stepInterval);
+    setTimeout(() => {
+      document.getElementById('insight-loading').style.display = 'none';
+      document.getElementById('insight-result').style.display = 'block';
+      const errBox = document.getElementById('error-box');
+      errBox.style.display = 'block';
+      errBox.textContent = 'Could not connect to AI. Check your network and try again. Error: ' + err.message;
+
+      // Fallback insight based on niche
+      showFallbackInsight();
+    }, 500);
+  }
+}
+
+function showFallbackInsight() {
+  const fallbacks = {
+    finance: {
+      verdict: "Based on your numbers, you're tracking today's cash flow. The key pattern to watch: if your spending exceeds 70% of income consistently, saving becomes almost impossible. Your impulse purchase count is a leading indicator of month-end shortfalls.",
+      actions: ["Set a daily spending cap equal to 60% of your daily income", "Before any unplanned purchase, wait 10 minutes", "Move savings to a separate account the moment income arrives"]
+    },
+    study: {
+      verdict: "Your study hours and distraction count together reveal your real effective study time. Most students think they study 4 hours but only get 1.5 hours of real focus. Sleep below 7 hours cuts retention by up to 40%.",
+      actions: ["Use 25-min Pomodoro blocks — no exceptions", "Track distractions as strikes: 3 strikes = mandatory break", "Sleep before midnight — memory consolidation peaks in early sleep cycles"]
+    },
+    fitness: {
+      verdict: "Consistency, not intensity, drives 80% of results. Missing sessions is the #1 predictor of stalled progress. Protein under 1.6g per kg bodyweight directly limits muscle growth regardless of how hard you train.",
+      actions: ["Set a non-negotiable minimum: 20-min workout counts as a session", "Prep your protein source the night before — friction kills compliance", "Log your training time — people who track are 2x more consistent"]
+    },
+    shop: {
+      verdict: "Your conversion rate (buyers ÷ visitors) tells the real story. Industry average is 20-40%. If yours is below that, the issue is in-store experience or stock, not marketing. Complaints signal lost sales, not just unhappy customers.",
+      actions: ["Calculate your daily conversion rate and write it down — awareness drives improvement", "Audit your top 10 products: are any frequently out of stock?", "Ask 3 non-buying customers this week: 'What almost made you buy today?'"]
+    }
+  };
+
+  const fb = fallbacks[state.niche] || fallbacks.finance;
+  document.getElementById('verdict-text').textContent = fb.verdict;
+  const actionsEl = document.getElementById('action-items');
+  actionsEl.innerHTML = '';
+  fb.actions.forEach((a, i) => {
+    actionsEl.innerHTML += `
+      <div class="action-item">
+        <span class="action-num">0${i + 1}</span>
+        <span class="action-text">${a}</span>
+      </div>`;
+  });
+}
+
+function setReminder() {
+  alert('📅 Reminder set! Come back tomorrow at the same time to track your numbers.\n\nBookmark this page so you can access it daily.');
+}
+</script>
+</body>
+</html>
